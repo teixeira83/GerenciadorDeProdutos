@@ -39,8 +39,8 @@ export function productCollectionMapper(json: ProductCollectionResponse): Collec
   return {
     totalRowCount: json.total_row_count,
     pageSize: json.page_size,
-    totalPages: json.total_page,
-    currentPage: json.current_pa,
+    totalPages: json.total_pages,
+    currentPage: json.current_page,
     nextPage: json.next_page,
     prevPage: json.prev_page,
     data: json.data.map(productCollectionItemMapper)

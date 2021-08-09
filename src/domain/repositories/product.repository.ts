@@ -4,7 +4,7 @@ import { RelatedProduct } from '../models/related-product.model'
 
 export interface ProductRepositoty {
   // TODO: getProducts deverá permitir receber parametros de paginação e filtro
-  getProducts(): Promise<Collection<ProductCollectionItem>>
+  getProducts(currentPage: number): Promise<Collection<ProductCollectionItem>>
   getProduct(id: number): Promise<Product>
   updateProduct(id: number, attributes: Record<string, any>): Promise<Product>
   createProduct(attributes: Record<string, any>): Promise<Product>

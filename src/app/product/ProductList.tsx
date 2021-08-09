@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Form, InputGroup } from 'react-bootstrap'
+import { Form, InputGroup, Pagination } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import { Collection } from '../../domain/models/collection'
 import { ProductCollectionItem } from '../../domain/models/product.model'
@@ -7,10 +7,27 @@ import repo from '../../data/repositories/product.repository'
 
 function ProductList() {
   const [productCollection, setProductCollection] = useState<Collection<ProductCollectionItem>>()
+  const [currentPage, setCurrentPage] = useState<number>(() => {
+    const currentPageInSessionStorage = sessionStorage.getItem('current_page') || '1'
+    return Number.parseInt(currentPageInSessionStorage)
+  })
+  const [totalPages, setTotalPages] = useState<number>(0)
+  const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
-    repo.getProducts().then(setProductCollection)
-  }, [])
+    if(loading) return
+    
+    (async () => {
+      await repo.getProducts(currentPage).then((response) => {
+        setLoading(true)
+        setProductCollection(response)
+        setCurrentPage(response.currentPage)
+        sessionStorage.setItem('current_page', response.currentPage.toString())
+        setTotalPages(response.totalPages)
+        setLoading(false)
+      })
+    })()
+  }, [currentPage])
 
   return (
     <div>
@@ -76,6 +93,31 @@ function ProductList() {
                   ))
                 )}
               </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan={4}>
+                    <Pagination style={{margin: 0, justifyContent:'center'}}>
+                      <Pagination.First onClick={() => setCurrentPage(1)} />
+                      <Pagination.Prev onClick={() => {
+                          const previousPage = currentPage === 1 ? 1 : currentPage - 1
+                          setCurrentPage(previousPage)
+                        }} 
+                      />
+                      {Array(totalPages).fill('').map((_, index) => {
+                        return ((index + 1) >= (currentPage - 2)) && ((index + 1) <= (currentPage + 2)) ?
+                          <Pagination.Item onClick={() => setCurrentPage(index + 1)}>{index + 1}</Pagination.Item> :
+                          null
+                      })}
+                      <Pagination.Next onClick={() => {
+                          const nextPage = currentPage === totalPages ? totalPages : currentPage + 1
+                          setCurrentPage(nextPage)
+                        }}
+                      />
+                      <Pagination.Last onClick={() => setCurrentPage(totalPages)} />
+                    </Pagination>
+                  </td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>

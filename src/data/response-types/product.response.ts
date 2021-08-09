@@ -29,8 +29,8 @@ export interface RelatedProductResponse {
 export interface ProductCollectionResponse {
   total_row_count: number
   page_size: number
-  total_page: number
-  current_pa: number
+  total_pages: number
+  current_page: number
   next_page: number | null
   prev_page: number | null
   data: ProductResponse[]
